@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:clima/screens/loading_screen.dart';
+import 'screens/loading_screen.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(Clima());
 
-class MyApp extends StatelessWidget {
+class Clima extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
