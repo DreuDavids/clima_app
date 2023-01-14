@@ -8,15 +8,15 @@ class Location {
 
   ///Gets the current location (lat,lon) of the user device
   Future<void> getCurrentLocation() async {
-    //requesting location permission from the device
-    //LocationPermission permission = await Geolocator.requestPermission();
+
+    LocationPermission permission = await Geolocator.requestPermission();
 
     ///Try to get the location
     ///getting the current position of the lowest accuracy
     try {
       Position position = await Geolocator.getCurrentPosition(
-          forceAndroidLocationManager: false,
-          desiredAccuracy: LocationAccuracy.low);
+          desiredAccuracy: LocationAccuracy.low,forceAndroidLocationManager: false,
+      );
 
       ///assigning the lat and longitude
       latitude = position.latitude;
@@ -27,6 +27,8 @@ class Location {
     catch (e) {
       ///print the exception error
       debugPrint('>>>Position Debug <<< $e');
+      //check if location permissions where granted
+
     }
   }
 }
