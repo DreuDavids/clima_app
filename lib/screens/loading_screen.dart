@@ -1,22 +1,40 @@
 import 'package:flutter/material.dart';
+import 'location_screen.dart';
+import 'package:clima_app/services/weather.dart';
 
 class LoadingScreen extends StatefulWidget {
+  const LoadingScreen({Key key}) : super(key: key);
+
   @override
-  _LoadingScreenState createState() => _LoadingScreenState();
+  LoadingScreenState createState() => LoadingScreenState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen> {
+class LoadingScreenState extends State<LoadingScreen> {
+  @override
+  void initState() {
+    //get location data
+    getLocationData();
+    super.initState();
+  }
+
+  //get device location
+  void getLocationData() async {
+    var weatherData = await WeatherModel().getLocationWeather();
+
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) {
+        return LocationScreen(
+          locationWeather: weatherData,
+        );
+      },
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            //Get the current location
-          },
-          child: Text('Get Location'),
-        ),
-      ),
-    );
+    return const Center(
+        child: CircularProgressIndicator(
+      color: Colors.white,
+    ));
   }
 }
