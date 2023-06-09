@@ -1,2 +1,2 @@
 //The openweathermap api key goes here
-const apiKey = '';
+const apiKey = 'replace with your own apikey';
