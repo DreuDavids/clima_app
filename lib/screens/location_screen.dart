@@ -1,12 +1,51 @@
+import 'package:clima_app/screens/city_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:clima_app/utilities/constants.dart';
+import 'package:clima_app/services/weather.dart';
 
 class LocationScreen extends StatefulWidget {
+  LocationScreen({this.locationWeather});
+
+  final locationWeather;
+
   @override
   _LocationScreenState createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  WeatherModel weather = WeatherModel();
+  int temperature;
+  String weatherIcon;
+  String cityName;
+  String message;
+
+  @override
+  void initState() {
+    super.initState();
+    updateUI(widget.locationWeather);
+  }
+
+  void updateUI(dynamic weatherData) {
+    setState(() {
+      if (weatherData == null) {
+        temperature = 0;
+        weatherIcon = 'Error';
+        message = 'Unable to get weather data';
+        cityName = '';
+        return;
+      }
+      //name
+      cityName = weatherData['name'];
+      //temp
+      double temp = weatherData['main']['temp'];
+      temperature = temp.toInt();
+      message = '${weather.getMessage(temperature)} in $cityName';
+      //condition id
+      var condition = weatherData['weather'][0]['id'];
+      weatherIcon = weather.getWeatherIcon(condition);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,16 +68,35 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      //get the current weather for the current location
+                      var weatherData = await weather.getLocationWeather();
+                      updateUI(weatherData);
+                    },
                     child: const Icon(
                       Icons.near_me,
+                      color: Colors.white,
                       size: 50.0,
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var typedName = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CityScreen(),
+                        ),
+                      );
+
+                      if (typedName != null) {
+                        var weatherData =
+                            await weather.getCityWeather(typedName);
+                        updateUI(weatherData);
+                      }
+                    },
                     child: const Icon(
                       Icons.location_city,
+                      color: Colors.white,
                       size: 50.0,
                     ),
                   ),
@@ -47,22 +105,22 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 15.0),
                 child: Row(
-                  children: const [
+                  children: <Widget>[
                     Text(
-                      '32°',
+                      '$temperature°',
                       style: defaultTempTextStyle,
                     ),
                     Text(
-                      '☀️',
+                      weatherIcon,
                       style: defaultConditionTextStyle,
                     ),
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(right: 15.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "It's 🍦 time in San Francisco!",
+                  message,
                   textAlign: TextAlign.right,
                   style: defaultMessageTextStyle,
                 ),
@@ -74,8 +132,3 @@ class _LocationScreenState extends State<LocationScreen> {
     );
   }
 }
-
-///variables
-// String locationName = decodedWeatherData['name'];
-// double temperature = decodedWeatherData['main']['temp'];
-// int weatherCondition = decodedWeatherData['weather'][0]['id'];
